@@ -3,13 +3,13 @@
 #pragma once
 
 #include "GameFramework/GameMode.h"
-#include "JetstreamerGameMode.generated.h"
+#include "JetGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class JETSTREAMER_API AJetstreamerGameMode : public AGameMode
+class JETSTREAMER_API AJetGameMode : public AGameMode
 {
 	GENERATED_UCLASS_BODY()
 
