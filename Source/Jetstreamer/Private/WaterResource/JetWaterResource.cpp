@@ -15,6 +15,8 @@ AJetWaterResource::AJetWaterResource(const class FPostConstructInitializePropert
 	{
 		resourceCollider->CanCharacterStepUpOn = ECB_No;
 		resourceCollider->bShouldUpdatePhysicsVolume = true;
+		static FName CollisionProfileName(TEXT("Pickup"));
+		resourceCollider->SetCollisionProfileName(CollisionProfileName);
 		RootComponent = resourceCollider;
 	}
 	//
