@@ -144,7 +144,7 @@ public class PlayerMovement : MonoBehaviour
         if (worldMovement.x != 0)
         {
             //
-            velocity.x = transform.eulerAngles.y == 0f ? 5 : -5;
+            velocity.x = worldMovement.x * walkSpeed;
         }
         else
         {

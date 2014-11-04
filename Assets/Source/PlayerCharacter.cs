@@ -11,6 +11,8 @@ public class PlayerCharacter : MonoBehaviour
     public string horizontalAxis = "Horizontal";
     // Axis Input Values
     protected Vector2 inputValue, lastInputValue;
+    //
+    protected int waterAmount = 0;
     // Flip flop bool for jetpack use
     private bool bPressedJetpack;
 
@@ -45,6 +47,18 @@ public class PlayerCharacter : MonoBehaviour
         Vector2 finalInput = ConsumeMovementInput();
         // Give Final Move input to Movement Component
         characterMovement.PerformMovement(finalInput);
+    }
+
+    /*
+     * 
+     */
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "WaterResource")
+        {
+            waterAmount++;
+            Destroy(other.gameObject);
+        }
     }
 
     /*
