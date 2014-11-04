@@ -1,30 +1,45 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(BoxCollider2D), typeof(CircleCollider2D), typeof(Rigidbody2D))]
+[RequireComponent(typeof(BoxCollider2D), typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour 
 {
-    // Character Component
-    [HideInInspector]
-    public PlayerCharacter PC;
-    //
-    public float gravity,
-                 airMoveMultiplier,
-                 walkSpeed;
-    // Current Velocity of Character
-    public Vector2 velocity = Vector2.zero;
     // Move Physics
-    protected enum MoveState
+    public enum MoveState
     {
         NONE,
         WALKING,
         FALLING,
+        JETPACK,
         MAX
     }
+
+    // Character Component
+    [HideInInspector]
+    public PlayerCharacter PC;
+
     // Current Move Physics
-    protected MoveState moveMode = MoveState.NONE;
-    // Holds Transform of Ground Check
-    private Transform groundCheck;
+    [HideInInspector]
+    public MoveState moveMode = MoveState.NONE;
+
+    //
+    public float walkSpeed,
+                 sideFallDecel,
+                 maxFallSpeed;
+
+    // Current Velocity of Character
+    public Vector2 velocity = Vector2.zero;
+
+    //
+    public int horizontalRays = 6,
+               verticalRays = 4,
+               rayMargin = 2;
+
+    //
+    public string groundLayer = "Ground";
+
+    //
+    private int groundLayerMask;
 
     /*
      * 
@@ -33,10 +48,10 @@ public class PlayerMovement : MonoBehaviour
     {
         // Get Player Character
         PC = GetComponent<PlayerCharacter>();
-        // Get groundCheck Transform
-        groundCheck = transform.FindChild("GroundCheck");
         // Default Move State
-        moveMode = MoveState.WALKING;
+        moveMode = MoveState.FALLING;
+        //
+        groundLayerMask = LayerMask.NameToLayer(groundLayer);
     }
 
     /*
@@ -58,9 +73,18 @@ public class PlayerMovement : MonoBehaviour
             case MoveState.FALLING:
                 MoveFalling(worldMovement);
                 break;
+            // Jetpack Physics
+            case MoveState.JETPACK:
+                MoveJetpack(worldMovement);
+                break;
             // Error
             default:
                 return;
+        }
+
+        if (CheckHorizontalCollision())
+        {
+            velocity.x = 0;
         }
     }
 
@@ -71,14 +95,14 @@ public class PlayerMovement : MonoBehaviour
     {
         // Current Position 2D
         Vector2 position2D = new Vector2(transform.position.x, transform.position.y);
-        // Move Amount
+        //
         Vector2 moveVector = worldMovement * walkSpeed;
-        // Apply Move
-        rigidbody2D.MovePosition(position2D + ((moveVector + velocity) * Time.fixedDeltaTime));
-        // If not grounded
-        if (!IsGrounded())
+        //
+        rigidbody2D.MovePosition(position2D + moveVector * Time.fixedDeltaTime);
+        //
+        if (!CheckVerticalCollision())
         {
-            // Set Falling
+            velocity = moveVector;
             moveMode = MoveState.FALLING;
         }
     }
@@ -90,18 +114,21 @@ public class PlayerMovement : MonoBehaviour
     {
         // Current Position 2D
         Vector2 position2D = new Vector2(transform.position.x, transform.position.y);
-        // Move Amount
-        Vector2 moveVector = (transform.eulerAngles == new Vector3(0f, 0f, 0f) ? Vector2.right : -Vector2.right) * airMoveMultiplier;
-        // Apply Gravity Velocity
-        velocity.y += (Physics2D.gravity.y * rigidbody2D.gravityScale) / rigidbody2D.mass;
-        // Apply Move
-        rigidbody2D.MovePosition(position2D + ((moveVector + velocity) * Time.fixedDeltaTime));
-        // If grounded
-        if (IsGrounded())
+        //
+        velocity += velocity.y <= maxFallSpeed ? Vector2.zero : Physics2D.gravity;
+        //
+        if (velocity.x != 0)
         {
-            // Zero out Velocity
-            velocity = Vector2.zero;
-            // Set Walking
+            //
+            velocity.x += Mathf.Sign(velocity.x) * sideFallDecel;
+        }
+        
+        //
+        rigidbody2D.MovePosition(position2D + velocity * Time.fixedDeltaTime);
+        //
+        if (velocity.y < 0 && CheckVerticalCollision())
+        {
+            velocity.y = 0;
             moveMode = MoveState.WALKING;
         }
     }
@@ -109,15 +136,77 @@ public class PlayerMovement : MonoBehaviour
     /*
      * 
      */
-    protected bool IsGrounded()
+    protected void MoveJetpack(Vector2 worldMovement)
     {
-        Vector2 rightBound = new Vector2(transform.position.x + .4f, transform.position.y);
-        Vector2 leftBound = new Vector2(transform.position.x - .4f, transform.position.y);
+        // Current Position 2D
+        Vector2 position2D = new Vector2(transform.position.x, transform.position.y);
+        //
+        if (worldMovement.x != 0)
+        {
+            //
+            velocity.x = transform.eulerAngles.y == 0f ? 5 : -5;
+        }
+        else
+        {
+            velocity.x = 0f;
+        }
+        //
+        rigidbody2D.MovePosition(position2D + velocity * Time.fixedDeltaTime);
+    }
 
-        bool isOnGround = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground")) ||
-                          Physics2D.Linecast(rightBound, new Vector2(rightBound.x, groundCheck.position.y), 1 << LayerMask.NameToLayer("Ground")) ||
-                          Physics2D.Linecast(leftBound, new Vector2(leftBound.x, groundCheck.position.y), 1 << LayerMask.NameToLayer("Ground"));
+    /*
+     * 
+     */
+    protected bool CheckVerticalCollision()
+    {
+        //
+        Vector2 startLoc = new Vector2(collider2D.bounds.min.x + rayMargin, collider2D.bounds.center.y);
+        Vector2 endLoc = new Vector2(collider2D.bounds.max.x - rayMargin, collider2D.bounds.center.y);
+        //
+        for (int i = 0; i < verticalRays; i++)
+        {
+            //
+            float lerpAmount = (float)i / ((float)verticalRays - 1);
+            // 
+            Vector2 rayOrigin = Vector2.Lerp(startLoc, endLoc, lerpAmount);
+            //
+            RaycastHit2D hitInfo = Physics2D.Raycast(rayOrigin, Mathf.Sign(velocity.y) * Vector2.up, rayMargin, 1 << groundLayerMask);
+            //
+            if (hitInfo.collider != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
-        return isOnGround;
+    /*
+     * 
+     */
+    protected bool CheckHorizontalCollision()
+    {
+        //
+        if (velocity.x != 0)
+        {
+            //
+            Vector2 startLoc = new Vector2(collider2D.bounds.center.x, collider2D.bounds.min.y + rayMargin);
+            Vector2 endLoc = new Vector2(collider2D.bounds.center.x, collider2D.bounds.max.y - rayMargin);
+            //
+            for (int i = 0; i < verticalRays; i++)
+            {
+                //
+                float lerpAmount = (float)i / ((float)horizontalRays - 1);
+                // 
+                Vector2 rayOrigin = Vector2.Lerp(startLoc, endLoc, lerpAmount);
+                //
+                RaycastHit2D hitInfo = Physics2D.Raycast(rayOrigin, Mathf.Sign(velocity.x) * Vector2.right, rayMargin, 1 << groundLayerMask);
+                //
+                if (hitInfo.collider != null)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -29,7 +29,14 @@ public class PlayerCharacter : MonoBehaviour
     {
         //
         if (Input.GetKey(KeyCode.Space))
-            characterMovement.velocity.y = 5;
+        {
+            characterMovement.moveMode = PlayerMovement.MoveState.JETPACK;
+            characterMovement.velocity.y = 10;
+        }
+        else if (characterMovement.moveMode == PlayerMovement.MoveState.JETPACK)
+        {
+            characterMovement.moveMode = PlayerMovement.MoveState.FALLING;
+        }
         // Horizontal Input Check
         float horizontalInput = Input.GetAxis(horizontalAxis);
         if (horizontalInput != 0)
