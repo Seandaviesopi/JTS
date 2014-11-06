@@ -1,96 +1,106 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(PlayerMovement))]
+[RequireComponent(typeof(CharacterController2D))]
 public class PlayerCharacter : MonoBehaviour 
 {
-    // Character Movement Component
+    // <summary>
+    //      Character Component References
+    // </summary>
     [HideInInspector]
-    public PlayerMovement characterMovement;
-    // Axis Names
+    public CharacterController2D movementController;
+
+    #region movement variables
+
+    // <summary>
+    //      Strings that store the names of used Axis
+    // </summary>
     public string horizontalAxis = "Horizontal";
-    // Axis Input Values
-    protected Vector2 inputValue, lastInputValue;
+
+    // Scale of Gravity on Character
+    public float gravityScale;
+
+    // Speed the Character moves on ground
+    public float groundSpeed;
+
+    // <summary>
+    //      Values used for storing current and previous velocity accumulations
+    // </summary>
+    protected Vector2 velocityValue, 
+                      lastVelocityValue;
+
+    #endregion
+
     //
     protected int waterAmount = 0;
-    // Flip flop bool for jetpack use
-    private bool bPressedJetpack;
 
-    /*
-     * 
-     */
     void Awake()
     {
-        characterMovement = GetComponent<PlayerMovement>();
+        movementController = GetComponent<CharacterController2D>();
     }
 
-    /*
-     * 
-     */
     void FixedUpdate()
     {
-        //
-        if (Input.GetKey(KeyCode.Space))
-        {
-            characterMovement.moveMode = PlayerMovement.MoveState.JETPACK;
-            characterMovement.velocity.y = 10;
-        }
-        else if (characterMovement.moveMode == PlayerMovement.MoveState.JETPACK)
-        {
-            characterMovement.moveMode = PlayerMovement.MoveState.FALLING;
-        }
-        // Horizontal Input Check
+        // Get Horizontal Input
         float horizontalInput = Input.GetAxis(horizontalAxis);
-        if (horizontalInput != 0)
+        // If Horizontal Input
+        if (horizontalInput != 0f)
+        {
+            // Move Left or Right
             MoveRight(horizontalInput);
-        // Collect Cumulative Input Value
-        Vector2 finalInput = ConsumeMovementInput();
-        // Give Final Move input to Movement Component
-        characterMovement.PerformMovement(finalInput);
+        }
+
+
+        Vector2 velocityMovement = ConsumeMovementVector() * Time.deltaTime;
+
+        if (movementController.isGrounded)
+        {
+            movementController.velocity.y = 0;
+        }
+        else
+        {
+            velocityMovement += Physics2D.gravity * gravityScale * Time.deltaTime;
+        }
+
+        movementController.move(velocityMovement);
+
     }
 
-    /*
-     * 
-     */
     void OnTriggerEnter2D(Collider2D other)
     {
+        // If water resource
         if (other.gameObject.tag == "WaterResource")
         {
+            // Increment Water Amount
             waterAmount++;
+            // Destroy Other
             Destroy(other.gameObject);
         }
     }
 
-    /*
-     * 
-     */
-    public Vector2 ConsumeMovementInput()
+    public Vector2 ConsumeMovementVector()
     {
-        // Cache input value
-        lastInputValue = inputValue;
+        // Cache vector value
+        lastVelocityValue = velocityValue;
         // Zero out Current Value
-        inputValue = Vector2.zero;
+        velocityValue = Vector2.zero;
         // Return Cached Value
-        return lastInputValue;
+        return lastVelocityValue;
     }
 
-    /*
-     * 
-     */
-    protected void AddMovementInput(Vector2 worldDirection, float inputScale)
+    protected void AddMovementInput(Vector2 worldVelocity, float inputScale)
     {
         // Add scaled direction vector
-        inputValue += worldDirection * inputScale;
+        velocityValue += worldVelocity * inputScale;
     }
 
-    /*
-     * 
-     */
     private void MoveRight(float inputAmount)
     {
         // Change look rotation
         transform.eulerAngles = inputAmount < 0 ? new Vector3(0f, 180f, 0f) : new Vector3(0f, 0f, 0f);
+        // Calculate Movement Velocity
+        Vector2 velocityMovement = Vector2.right * groundSpeed;
         // Add right or left movement input
-        AddMovementInput(Vector2.right, inputAmount);
+        AddMovementInput(velocityMovement, inputAmount);
     }
 }
