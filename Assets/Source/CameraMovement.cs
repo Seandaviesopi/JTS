@@ -28,12 +28,10 @@ public class CameraMovement : MonoBehaviour
 	void FixedUpdate () 
     {
         // Valid
-        if (targetActor != null && cameraBounds != null) 
+        if (targetActor != null) 
         {
             // Get Half Screen Location of target
             Vector3 cameraPoint = camera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0f));
-            // Get Viewport Location of target
-            Vector3 targetPoint = camera.WorldToViewportPoint(targetActor.position);
             // Vector Distance
             Vector3 distance = targetActor.position - cameraPoint;
             // Calculate Camera Destination
