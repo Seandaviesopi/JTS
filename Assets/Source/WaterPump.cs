@@ -7,30 +7,65 @@ public class WaterPump : PoweredObject
 
     public bool bPumpRight = true;
 
-    public int maxPumpAmount;
+    public float tickTime;
 
-    protected int currentPumpAmount = 0;
+    public int maxTicks;
+
+    protected bool bCanPumpWater = false;
+
+    protected float currentTime = 0f, 
+                    timerInterval = 0f;
+
+    protected int currentTicks = 0;
+
+    public override void StopPower()
+    {
+        base.StopPower();
+
+        currentTime = 0f;
+        timerInterval = 0f;
+        currentTicks = 0;
+    }
 
     protected override void ExecutePower()
     {
-        
-        
+        // Increase timer
+        currentTime += Time.deltaTime;
+        // If timer interval
+        if (currentTime >= timerInterval + tickTime)
+        {
+            // Increment Ticks
+            currentTicks++;
+            // If max ticks
+            if (currentTicks == maxTicks)
+            {
+                // Stop Power
+                StopPower();
+                return;
+            }
+            //
+            bCanPumpWater = true;
+            //
+            timerInterval = currentTime;
+        }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerStay2D(Collider2D other)
     {
-        //
-        WaterResource newWaterResource = other.gameObject.GetComponent<WaterResource>();
-        // If water resource
-        if (newWaterResource && newWaterResource.bCanPickup)
+        if (bCanPumpWater)
         {
-            // Increment Water Amount
-            currentPumpAmount++;
             //
-            Instantiate(other.gameObject, pumpLocTwo.position, new Quaternion());
-            // Destroy Other
-            Destroy(other.gameObject);
-            
+            WaterResource newWaterResource = other.gameObject.GetComponent<WaterResource>();
+            // If water resource
+            if (newWaterResource && newWaterResource.bCanPickup)
+            {
+                //
+                Instantiate(other.gameObject, pumpLocTwo.position, new Quaternion());
+                // Destroy Other
+                Destroy(other.gameObject);
+                //
+                bCanPumpWater = false;
+            }
         }
     }
 }

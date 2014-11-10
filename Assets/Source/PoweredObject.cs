@@ -4,7 +4,7 @@ using System.Collections;
 abstract public class PoweredObject : MonoBehaviour 
 {
     //
-    protected SteamEngine poweringObject;
+    public SteamEngine poweringObject;
     //
     protected bool bIsPowered;
 
@@ -24,13 +24,13 @@ abstract public class PoweredObject : MonoBehaviour
     }
 
     //
-    public void StartPower()
+    virtual public void StartPower()
     {
         bIsPowered = true;
     }
 
     //
-    public void StopPower()
+    virtual public void StopPower()
     {
         //
         bIsPowered = false;

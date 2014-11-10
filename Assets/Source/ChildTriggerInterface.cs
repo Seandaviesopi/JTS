@@ -1,0 +1,26 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class ChildTriggerInterface : MonoBehaviour 
+{
+    // Reference to the parent object
+    protected GameObject parentObject;
+
+    #region MonoBehaviour
+
+    void Awake()
+    {
+        // If we have a root
+        if (transform.root != null)
+            // Set parent object
+            parentObject = transform.root.gameObject;
+    }
+
+    void OnTriggerStay2D(Collider2D other)
+    {
+        // Send collision message to parent
+        parentObject.SendMessage(System.Reflection.MethodBase.GetCurrentMethod().Name, other);
+    }
+
+    #endregion
+}

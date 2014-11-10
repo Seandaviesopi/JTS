@@ -10,6 +10,8 @@ public class SteamEngine : MonoBehaviour
     public GameObject waterResource;
     //
     public Transform waterSpawn;
+    //
+    private bool bIsPowered = false;
 
     //
     void Awake()
@@ -22,6 +24,9 @@ public class SteamEngine : MonoBehaviour
     {
         if (waterResource)
         {
+            //
+            bIsPowered = false;
+            //
             GameObject.Instantiate(waterResource, waterSpawn.position, new Quaternion());
         }
     }
@@ -30,14 +35,20 @@ public class SteamEngine : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         //
-        WaterResource newWaterResource = other.gameObject.GetComponent<WaterResource>();
-        // If water resource
-        if (newWaterResource && newWaterResource.bCanPickup)
+        if (!bIsPowered)
         {
-            // Destroy Other
-            Destroy(other.gameObject);
             //
-            poweredObject.StartPower();
+            WaterResource newWaterResource = other.gameObject.GetComponent<WaterResource>();
+            // If water resource
+            if (newWaterResource && newWaterResource.bCanPickup)
+            {
+                // Destroy Other
+                Destroy(other.gameObject);
+                //
+                poweredObject.StartPower();
+                //
+                bIsPowered = true;
+            }
         }
     }
 }
