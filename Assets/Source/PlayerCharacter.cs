@@ -203,8 +203,6 @@ public class PlayerCharacter : MonoBehaviour
                         if (waterAmount != 0)
                         {
                             //
-                            waterAmount--;
-                            //
                             GameObject waterResource = DropWaterResource();
                             // 
                             waterResource.rigidbody2D.AddForce((otherGameObject.transform.position - waterResource.transform.position) * 100f);
@@ -217,17 +215,13 @@ public class PlayerCharacter : MonoBehaviour
 
     protected GameObject DropWaterResource()
     {
-        if (waterAmount > 0)
-        {
-            //
-            waterAmount--;
-            //
-            GameObject newWaterResource = (GameObject)Instantiate(waterResource, new Vector2(transform.position.x, transform.position.y), new Quaternion());
-            // Don't affect rigidbody
-            Physics2D.IgnoreCollision(newWaterResource.collider2D, collider2D);
-            //
-            return newWaterResource;
-        }
-        return null;
+        //
+        waterAmount--;
+        //
+        GameObject newWaterResource = (GameObject)Instantiate(waterResource, new Vector2(transform.position.x, transform.position.y), new Quaternion());
+        // Don't affect rigidbody
+        Physics2D.IgnoreCollision(newWaterResource.collider2D, collider2D);
+        //
+        return newWaterResource;
     }
 }
