@@ -13,6 +13,15 @@ public class PlayerCharacter : MonoBehaviour
     // Water Resource Prefab
     public GameObject waterResource;
 
+    #region jetpack variables
+
+    protected bool bWantsJetpack = false,
+                   bActiveJetpack = false;
+
+    protected Vector2 jetStart = Vector2.zero;
+
+    #endregion
+
     #region movement variables
 
     // <summary>
@@ -62,7 +71,7 @@ public class PlayerCharacter : MonoBehaviour
         //
         if (Input.GetKey(KeyCode.Space))
         {
-            AddMovementInput(Vector2.up * 20, 1f);
+            AddMovementInput(Vector2.up * 25f, 1f);
         }
         // Get Horizontal Input
         float horizontalInput = Input.GetAxis(horizontalAxis);
@@ -74,7 +83,7 @@ public class PlayerCharacter : MonoBehaviour
         }
 
         Vector2 velocityMovement = ConsumeMovementVector() * Time.fixedDeltaTime;
-
+        
         if (characterMovement.isGrounded)
         {
             characterMovement.velocity.y = 0;
@@ -99,6 +108,50 @@ public class PlayerCharacter : MonoBehaviour
             waterAmount++;
             // Destroy Other
             Destroy(other.gameObject);
+        }
+    }
+
+    #endregion
+
+    #region Jetpack Functions
+
+    protected void OnStartJetpack()
+    {
+        bWantsJetpack = true;
+    }
+
+    protected void OnStopJetpack()
+    {
+        bWantsJetpack = false;
+    }
+
+    protected void MoveJetpack()
+    { 
+        if (bWantsJetpack && !bActiveJetpack && waterAmount != 0)
+        {
+            bActiveJetpack = true;
+            jetStart = transform.position;
+        }
+
+        if (bActiveJetpack)
+        {
+            if (Vector2.Distance(jetStart, transform.position) >= 2.5f)
+            {
+                DropWaterResource();
+
+                if (bWantsJetpack && waterAmount != 0)
+                {
+                    jetStart += new Vector2(2.5f, 2.5f);
+                }
+                else
+                {
+                    bActiveJetpack = false;
+                }
+            }
+            else
+            {
+                AddMovementInput(Vector2.up * 25f, 1f);
+            }
         }
     }
 
@@ -152,15 +205,29 @@ public class PlayerCharacter : MonoBehaviour
                             //
                             waterAmount--;
                             //
-                            GameObject newWaterResource = (GameObject)Instantiate(waterResource, new Vector2(transform.position.x, transform.position.y), new Quaternion());
-                            // Don't affect rigidbody
-                            Physics2D.IgnoreCollision(newWaterResource.collider2D, collider2D);
+                            GameObject waterResource = DropWaterResource();
                             // 
-                            newWaterResource.rigidbody2D.AddForce((otherGameObject.transform.position - newWaterResource.transform.position) * 100f);
+                            waterResource.rigidbody2D.AddForce((otherGameObject.transform.position - waterResource.transform.position) * 100f);
                         }
                         break;
                 }
             }
         }
+    }
+
+    protected GameObject DropWaterResource()
+    {
+        if (waterAmount > 0)
+        {
+            //
+            waterAmount--;
+            //
+            GameObject newWaterResource = (GameObject)Instantiate(waterResource, new Vector2(transform.position.x, transform.position.y), new Quaternion());
+            // Don't affect rigidbody
+            Physics2D.IgnoreCollision(newWaterResource.collider2D, collider2D);
+            //
+            return newWaterResource;
+        }
+        return null;
     }
 }

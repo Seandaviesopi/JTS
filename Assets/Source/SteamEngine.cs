@@ -32,7 +32,7 @@ public class SteamEngine : MonoBehaviour
     }
 
     // Collision Enter
-    void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerStay2D(Collider2D other)
     {
         //
         if (!bIsPowered)
