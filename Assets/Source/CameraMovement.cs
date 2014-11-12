@@ -30,6 +30,7 @@ public class CameraMovement : MonoBehaviour
         // Valid
         if (targetActor != null) 
         {
+            
             // Get Half Screen Location of target
             Vector3 cameraPoint = camera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0f));
             // Vector Distance
@@ -37,7 +38,7 @@ public class CameraMovement : MonoBehaviour
             // Calculate Camera Destination
             Vector3 destination = transform.position + distance;
             //
-            destination.x = Mathf.Clamp(destination.x, cameraBounds.min.x - cameraPoint.x, cameraBounds.max.x - cameraPoint.x);
+            destination.x = Mathf.Clamp(destination.x, cameraBounds.min.x + camera.orthographicSize, cameraBounds.max.x - camera.orthographicSize);
             destination.y = transform.position.y;
             destination.z = transform.position.z;
             //

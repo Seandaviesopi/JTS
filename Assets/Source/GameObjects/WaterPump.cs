@@ -5,6 +5,8 @@ public class WaterPump : PoweredObject
 {
     public Transform pumpLocOne, pumpLocTwo;
 
+    public Vector2 spawnVelocity = Vector2.zero;
+
     public bool bPumpRight = true;
 
     public float tickTime;
@@ -60,7 +62,9 @@ public class WaterPump : PoweredObject
             if (newWaterResource && newWaterResource.bCanPickup)
             {
                 //
-                Instantiate(other.gameObject, pumpLocTwo.position, new Quaternion());
+                GameObject waterResource = (GameObject)Instantiate(other.gameObject, pumpLocTwo.position, new Quaternion());
+                // 
+                waterResource.rigidbody2D.AddForce(new Vector2(Random.Range(-spawnVelocity.x, spawnVelocity.x), spawnVelocity.y));
                 // Destroy Other
                 Destroy(other.gameObject);
                 //

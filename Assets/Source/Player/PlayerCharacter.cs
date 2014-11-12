@@ -9,6 +9,9 @@ public class PlayerCharacter : MonoBehaviour
     // Water Resource Prefab
     public GameObject waterResource;
 
+    //
+    public float waterThrowVelocity;
+
     #region jetpack variables
 
     protected bool bWantsJetpack = false,
@@ -53,12 +56,7 @@ public class PlayerCharacter : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-
-            Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            RaycastHit2D clickHit = Physics2D.Raycast(mouseRay.origin, mouseRay.direction, Mathf.Infinity);
-
-            ExecuteClickInteraction(clickHit);
+            ExecuteClickInteraction();
         }
     }
 
@@ -179,29 +177,15 @@ public class PlayerCharacter : MonoBehaviour
 
     #endregion
 
-    protected void ExecuteClickInteraction(RaycastHit2D other)
+    protected void ExecuteClickInteraction()
     {
-        if (other.collider != null)
+        //
+        if (waterAmount != 0)
         {
             //
-            GameObject otherGameObject = other.collider.gameObject;
-
-            if (otherGameObject)
-            {
-                switch (otherGameObject.tag)
-                {
-                    case "SteamEngine":
-                        //
-                        if (waterAmount != 0)
-                        {
-                            //
-                            GameObject waterResource = DropWaterResource();
-                            // 
-                            waterResource.rigidbody2D.AddForce((otherGameObject.transform.position - waterResource.transform.position) * 100f);
-                        }
-                        break;
-                }
-            }
+            GameObject waterResource = DropWaterResource();
+            // 
+            waterResource.rigidbody2D.AddForce((Camera.main.ScreenToWorldPoint(Input.mousePosition) - waterResource.transform.position) * waterThrowVelocity);
         }
     }
 
