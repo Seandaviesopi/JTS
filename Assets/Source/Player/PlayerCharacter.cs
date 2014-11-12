@@ -1,14 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(CharacterController2D))]
 public class PlayerCharacter : MonoBehaviour 
 {
-    // <summary>
-    //      Component References
-    // </summary>
-    [HideInInspector]
-    public CharacterController2D characterMovement;
+    //
+    public PlayerController2D characterMovement;
 
     // Water Resource Prefab
     public GameObject waterResource;
@@ -50,7 +46,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void Awake()
     {
-        characterMovement = GetComponent<CharacterController2D>();
+        characterMovement = GetComponent<PlayerController2D>();
     }
 
     void Update()
@@ -73,6 +69,7 @@ public class PlayerCharacter : MonoBehaviour
         {
             AddMovementInput(Vector2.up * 25f, 1f);
         }
+
         // Get Horizontal Input
         float horizontalInput = Input.GetAxis(horizontalAxis);
         // If Horizontal Input
@@ -83,18 +80,13 @@ public class PlayerCharacter : MonoBehaviour
         }
 
         Vector2 velocityMovement = ConsumeMovementVector() * Time.fixedDeltaTime;
-        
-        if (characterMovement.isGrounded)
-        {
-            characterMovement.velocity.y = 0;
-        }
-        else
+
+        if (!characterMovement.isGrounded)
         {
             velocityMovement += Physics2D.gravity * gravityScale * Time.fixedDeltaTime;
         }
 
-        characterMovement.move(velocityMovement);
-
+        characterMovement.Move(velocityMovement);
     }
 
     void OnTriggerEnter2D(Collider2D other)
