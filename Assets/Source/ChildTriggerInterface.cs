@@ -13,7 +13,10 @@ public class ChildTriggerInterface : MonoBehaviour
         // If we have a root
         if (transform.root != null)
             // Set parent object
-            parentObject = transform.root.gameObject;
+            parentObject = transform.parent.gameObject;
+        //
+        if (parentObject == null)
+            throw new UnityException("Parent object not set");
     }
 
     void OnTriggerStay2D(Collider2D other)

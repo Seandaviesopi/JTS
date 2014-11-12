@@ -12,6 +12,9 @@ public class PlayerCharacter : MonoBehaviour
     //
     public float waterThrowVelocity;
 
+    //
+    public int waterAmount = 0;
+
     #region jetpack variables
 
     protected bool bWantsJetpack = false,
@@ -42,9 +45,6 @@ public class PlayerCharacter : MonoBehaviour
 
     #endregion
 
-    //
-    protected int waterAmount = 0;
-
     #region MonoBehaviour
 
     void Awake()
@@ -65,7 +65,7 @@ public class PlayerCharacter : MonoBehaviour
         //
         if (Input.GetKey(KeyCode.Space))
         {
-            AddMovementInput(Vector2.up * 25f, 1f);
+            AddMovementInput(Vector2.up * 20f, 1f);
         }
 
         // Get Horizontal Input

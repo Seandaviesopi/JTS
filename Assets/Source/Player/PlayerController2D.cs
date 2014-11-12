@@ -18,6 +18,8 @@ public class PlayerController2D : MonoBehaviour {
 
         isGrounded = Physics2D.OverlapArea(newRect.min, newRect.max, groundLayer);
 
+        Debug.DrawLine(newRect.min, newRect.max);
+
         rigidbody2D.MovePosition((Vector2)transform.position + worldMovement);
     }
 

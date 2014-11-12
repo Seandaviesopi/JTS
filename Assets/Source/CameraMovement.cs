@@ -7,7 +7,7 @@ public class CameraMovement : MonoBehaviour
     public float dampTime = 0.3f;
     // Target actor of Camera
     protected Transform targetActor;
-    //
+    // Bounds of the world
     protected Bounds cameraBounds;
     // Current Velocity
     private Vector3 velocity = Vector3.zero;
@@ -36,9 +36,9 @@ public class CameraMovement : MonoBehaviour
             // Vector Distance
             Vector3 distance = targetActor.position - cameraPoint;
             // Calculate Camera Destination
-            Vector3 destination = transform.position + distance;
+            Vector3 destination = (transform.position + distance);
             //
-            destination.x = Mathf.Clamp(destination.x, cameraBounds.min.x + camera.orthographicSize, cameraBounds.max.x - camera.orthographicSize);
+            destination.x = Mathf.Clamp(destination.x, cameraBounds.min.x + camera.orthographicSize * camera.aspect, cameraBounds.max.x - camera.orthographicSize * camera.aspect);
             destination.y = transform.position.y;
             destination.z = transform.position.z;
             //
