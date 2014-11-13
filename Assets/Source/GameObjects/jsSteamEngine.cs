@@ -2,10 +2,10 @@
 using System.Collections;
 
 [RequireComponent(typeof(BoxCollider2D))]
-public class SteamEngine : MonoBehaviour 
+public class jsSteamEngine : MonoBehaviour 
 {
     // Objects Powered by this Engine
-    public PoweredObject poweredObject;
+    public jsPoweredObject poweredObject;
     // 
     public GameObject waterResource;
     //
@@ -38,7 +38,7 @@ public class SteamEngine : MonoBehaviour
         if (!bIsPowered)
         {
             //
-            WaterResource newWaterResource = other.gameObject.GetComponent<WaterResource>();
+            jsWaterResource newWaterResource = other.gameObject.GetComponent<jsWaterResource>();
             // If water resource
             if (newWaterResource && newWaterResource.bCanPickup)
             {

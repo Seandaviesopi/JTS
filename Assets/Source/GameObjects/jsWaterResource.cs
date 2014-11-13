@@ -2,7 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class WaterResource : MonoBehaviour
+public class jsWaterResource : MonoBehaviour
 {
     //
     public enum WaterResourceState

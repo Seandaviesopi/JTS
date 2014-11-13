@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class HUDComponent : MonoBehaviour
+public class jsHUDComponent : MonoBehaviour
 {
 
-    public PlayerCharacter PC;
+    public jsPlayerCharacter PC;
 
     void Awake()
     {
@@ -12,7 +12,7 @@ public class HUDComponent : MonoBehaviour
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         //
         if (playerObject != null)
-            PC = playerObject.GetComponent<PlayerCharacter>();
+            PC = playerObject.GetComponent<jsPlayerCharacter>();
     }
     
     void OnGUI() 

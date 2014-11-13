@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerCharacter : MonoBehaviour 
+public class jsPlayerCharacter : MonoBehaviour 
 {
     //
-    public PlayerController2D characterMovement;
+    public jsPlayerController2D characterMovement;
 
     // Water Resource Prefab
     public GameObject waterResource;
@@ -49,7 +49,7 @@ public class PlayerCharacter : MonoBehaviour
 
     void Awake()
     {
-        characterMovement = GetComponent<PlayerController2D>();
+        characterMovement = GetComponent<jsPlayerController2D>();
     }
 
     void Update()
@@ -58,16 +58,18 @@ public class PlayerCharacter : MonoBehaviour
         {
             ExecuteClickInteraction();
         }
-    }
 
-    void FixedUpdate()
-    {
         //
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            AddMovementInput(Vector2.up * 20f, 1f);
+            OnStartJetpack();
         }
-
+        else if (Input.GetKeyUp(KeyCode.Space))
+        {
+            OnStopJetpack();
+        }
+        //
+        MoveJetpack();
         // Get Horizontal Input
         float horizontalInput = Input.GetAxis(horizontalAxis);
         // If Horizontal Input
@@ -77,20 +79,25 @@ public class PlayerCharacter : MonoBehaviour
             MoveRight(horizontalInput);
         }
 
-        Vector2 velocityMovement = ConsumeMovementVector() * Time.fixedDeltaTime;
+        Vector2 velocityMovement = ConsumeMovementVector() * Time.deltaTime;
 
         if (!characterMovement.isGrounded)
         {
-            velocityMovement += Physics2D.gravity * gravityScale * Time.fixedDeltaTime;
+            velocityMovement += Physics2D.gravity * gravityScale * Time.deltaTime;
         }
 
         characterMovement.Move(velocityMovement);
     }
 
+    void FixedUpdate()
+    {
+       
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         //
-        WaterResource newWaterResource = other.gameObject.GetComponent<WaterResource>();
+        jsWaterResource newWaterResource = other.gameObject.GetComponent<jsWaterResource>();
         // If water resource
         if (newWaterResource && newWaterResource.bCanPickup)
         {
@@ -125,13 +132,13 @@ public class PlayerCharacter : MonoBehaviour
 
         if (bActiveJetpack)
         {
-            if (Vector2.Distance(jetStart, transform.position) >= 2.5f)
+            if (Vector2.Distance(jetStart, transform.position) >= 2.8f)
             {
                 DropWaterResource();
 
                 if (bWantsJetpack && waterAmount != 0)
                 {
-                    jetStart += new Vector2(2.5f, 2.5f);
+                    jetStart = new Vector2(transform.position.x, jetStart.y + 2.8f);
                 }
                 else
                 {
@@ -194,7 +201,7 @@ public class PlayerCharacter : MonoBehaviour
         //
         waterAmount--;
         //
-        GameObject newWaterResource = (GameObject)Instantiate(waterResource, new Vector2(transform.position.x, transform.position.y), new Quaternion());
+        GameObject newWaterResource = (GameObject)Instantiate(waterResource, new Vector2(transform.position.x, renderer.bounds.min.y), new Quaternion());
         // Don't affect rigidbody
         Physics2D.IgnoreCollision(newWaterResource.collider2D, collider2D);
         //

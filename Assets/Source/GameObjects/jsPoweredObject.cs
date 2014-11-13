@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-abstract public class PoweredObject : MonoBehaviour 
+abstract public class jsPoweredObject : MonoBehaviour 
 {
     //
-    public SteamEngine poweringObject;
+    public jsSteamEngine poweringObject;
     //
     protected bool bIsPowered;
 
@@ -18,7 +18,7 @@ abstract public class PoweredObject : MonoBehaviour
     }
 
     //
-    public void SetOwner(SteamEngine newOwner)
+    public void SetOwner(jsSteamEngine newOwner)
     {
         poweringObject = newOwner;
     }

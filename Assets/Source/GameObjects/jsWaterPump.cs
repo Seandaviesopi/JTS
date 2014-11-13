@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class WaterPump : PoweredObject 
+public class jsWaterPump : jsPoweredObject 
 {
     public Transform pumpLocOne, pumpLocTwo;
 
@@ -57,7 +57,7 @@ public class WaterPump : PoweredObject
         if (bCanPumpWater)
         {
             //
-            WaterResource newWaterResource = other.gameObject.GetComponent<WaterResource>();
+            jsWaterResource newWaterResource = other.gameObject.GetComponent<jsWaterResource>();
             // If water resource
             if (newWaterResource && newWaterResource.bCanPickup)
             {

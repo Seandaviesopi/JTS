@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CameraMovement : MonoBehaviour 
+public class jsCameraMovement : MonoBehaviour 
 {
     // Damp movement
     public float dampTime = 0.3f;

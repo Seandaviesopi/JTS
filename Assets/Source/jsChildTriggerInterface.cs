@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ChildTriggerInterface : MonoBehaviour 
+public class jsChildTriggerInterface : MonoBehaviour 
 {
     // Reference to the parent object
     protected GameObject parentObject;
