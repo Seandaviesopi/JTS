@@ -40,7 +40,7 @@ public class jsSteamEngine : MonoBehaviour
             //
             jsWaterResource newWaterResource = other.gameObject.GetComponent<jsWaterResource>();
             // If water resource
-            if (newWaterResource && newWaterResource.bCanPickup)
+            if (newWaterResource)
             {
                 // Destroy Other
                 Destroy(other.gameObject);

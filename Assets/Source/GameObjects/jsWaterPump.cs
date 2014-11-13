@@ -5,6 +5,9 @@ public class jsWaterPump : jsPoweredObject
 {
     public Transform pumpLocOne, pumpLocTwo;
 
+    // Water Resource Prefab
+    public GameObject waterResource;
+
     public Vector2 spawnVelocity = Vector2.zero;
 
     public bool bPumpRight = true;
@@ -57,16 +60,16 @@ public class jsWaterPump : jsPoweredObject
         if (bCanPumpWater)
         {
             //
-            jsWaterResource newWaterResource = other.gameObject.GetComponent<jsWaterResource>();
+            jsWaterResource otherWaterResource = other.gameObject.GetComponent<jsWaterResource>();
             // If water resource
-            if (newWaterResource && newWaterResource.bCanPickup)
+            if (otherWaterResource)
             {
-                //
-                GameObject waterResource = (GameObject)Instantiate(other.gameObject, pumpLocTwo.position, new Quaternion());
-                // 
-                waterResource.rigidbody2D.AddForce(new Vector2(Random.Range(-spawnVelocity.x, spawnVelocity.x), spawnVelocity.y));
                 // Destroy Other
                 Destroy(other.gameObject);
+                //
+                GameObject newWaterResource = (GameObject)Instantiate(waterResource, pumpLocTwo.position, new Quaternion());
+                // 
+                newWaterResource.rigidbody2D.AddForce(new Vector2(Random.Range(-spawnVelocity.x, spawnVelocity.x), spawnVelocity.y));
                 //
                 bCanPumpWater = false;
             }

@@ -5,6 +5,10 @@ public class jsPlayerCharacter : MonoBehaviour
 {
     //
     public jsPlayerController2D characterMovement;
+    //
+    public BoxCollider2D boxCollision;
+    //
+    public CircleCollider2D circleCollision;
 
     // Water Resource Prefab
     public GameObject waterResource;
@@ -50,6 +54,10 @@ public class jsPlayerCharacter : MonoBehaviour
     void Awake()
     {
         characterMovement = GetComponent<jsPlayerController2D>();
+
+        boxCollision = GetComponent<BoxCollider2D>();
+
+        circleCollision = GetComponent<CircleCollider2D>();
     }
 
     void Update()
@@ -97,14 +105,18 @@ public class jsPlayerCharacter : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         //
-        jsWaterResource newWaterResource = other.gameObject.GetComponent<jsWaterResource>();
-        // If water resource
-        if (newWaterResource && newWaterResource.bCanPickup)
+        if (characterMovement.isGrounded)
         {
-            // Increment Water Amount
-            waterAmount++;
-            // Destroy Other
-            Destroy(other.gameObject);
+            //
+            jsWaterResource newWaterResource = other.gameObject.GetComponent<jsWaterResource>();
+            // If water resource
+            if (newWaterResource)
+            {
+                // Increment Water Amount
+                waterAmount++;
+                // Destroy Other
+                Destroy(other.gameObject);
+            }
         }
     }
 
@@ -134,7 +146,9 @@ public class jsPlayerCharacter : MonoBehaviour
         {
             if (Vector2.Distance(jetStart, transform.position) >= 2.8f)
             {
-                DropWaterResource();
+                Vector2 spawnLocation = transform.eulerAngles.y == 0f ? new Vector2(renderer.bounds.min.x, renderer.bounds.min.y) : new Vector2(renderer.bounds.max.x, renderer.bounds.min.y);
+
+                DropWaterResource(spawnLocation, (spawnLocation - (Vector2)transform.position).normalized * 100f);
 
                 if (bWantsJetpack && waterAmount != 0)
                 {
@@ -190,20 +204,24 @@ public class jsPlayerCharacter : MonoBehaviour
         if (waterAmount != 0)
         {
             //
-            GameObject waterResource = DropWaterResource();
-            // 
-            waterResource.rigidbody2D.AddForce((Camera.main.ScreenToWorldPoint(Input.mousePosition) - waterResource.transform.position) * waterThrowVelocity);
+            Vector2 mouseClick = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //
+            Vector2 spawnVelocity = (mouseClick - (Vector2)transform.position).normalized;
+            //
+            Vector2 spawnLocation = mouseClick.x > transform.position.x ? (Vector2)transform.position + Vector2.right * 2 : (Vector2)transform.position + -Vector2.right * 2;
+            //
+            GameObject waterResource = DropWaterResource(spawnLocation, spawnVelocity * waterThrowVelocity);
         }
     }
 
-    protected GameObject DropWaterResource()
+    protected GameObject DropWaterResource(Vector2 spawnLocation, Vector2 spawnVelocity)
     {
         //
         waterAmount--;
         //
-        GameObject newWaterResource = (GameObject)Instantiate(waterResource, new Vector2(transform.position.x, renderer.bounds.min.y), new Quaternion());
-        // Don't affect rigidbody
-        Physics2D.IgnoreCollision(newWaterResource.collider2D, collider2D);
+        GameObject newWaterResource = (GameObject)Instantiate(waterResource, spawnLocation, new Quaternion());
+        //
+        newWaterResource.rigidbody2D.AddForce(spawnVelocity);
         //
         return newWaterResource;
     }
