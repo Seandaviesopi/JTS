@@ -21,12 +21,13 @@ public class jsPlayerCharacter : MonoBehaviour
 
     #region jetpack variables
 
-    public float jetpackTileSize;
+    public float maxFuel = 100f, 
+                 fuelUsage;
+
+    protected float fuelAmount;
 
     protected bool bWantsJetpack = false,
                    bActiveJetpack = false;
-
-    protected Vector2 jetStart = Vector2.zero;
 
     #endregion
 
@@ -60,6 +61,8 @@ public class jsPlayerCharacter : MonoBehaviour
         boxCollision = GetComponent<BoxCollider2D>();
 
         circleCollision = GetComponent<CircleCollider2D>();
+
+        fuelAmount = maxFuel;
     }
 
     void Update()
@@ -141,22 +144,19 @@ public class jsPlayerCharacter : MonoBehaviour
         if (bWantsJetpack && !bActiveJetpack && waterAmount != 0)
         {
             bActiveJetpack = true;
-            jetStart = transform.position;
         }
 
         if (bActiveJetpack)
         {
-            if (Vector2.Distance(jetStart, transform.position) >= jetpackTileSize)
+            if (fuelAmount <= 0f)
             {
                 Vector2 spawnLocation = transform.eulerAngles.y == 0f ? new Vector2(renderer.bounds.min.x, renderer.bounds.min.y) : new Vector2(renderer.bounds.max.x, renderer.bounds.min.y);
 
+                fuelAmount = maxFuel;
+
                 DropWaterResource(spawnLocation, (spawnLocation - (Vector2)transform.position).normalized * 100f);
 
-                if (bWantsJetpack && waterAmount != 0)
-                {
-                    jetStart = new Vector2(transform.position.x, jetStart.y + jetpackTileSize);
-                }
-                else
+                if (!bWantsJetpack || waterAmount == 0)
                 {
                     bActiveJetpack = false;
                 }
@@ -164,6 +164,10 @@ public class jsPlayerCharacter : MonoBehaviour
             else
             {
                 AddMovementInput(Vector2.up * 25f, 1f);
+
+                fuelAmount = Mathf.Clamp(fuelAmount - (fuelUsage * Time.deltaTime), 0f, fuelAmount);
+
+                print(fuelAmount);
             }
         }
     }
