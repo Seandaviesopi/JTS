@@ -21,6 +21,8 @@ public class jsPlayerCharacter : MonoBehaviour
 
     #region jetpack variables
 
+    public float jetpackTileSize;
+
     protected bool bWantsJetpack = false,
                    bActiveJetpack = false;
 
@@ -144,7 +146,7 @@ public class jsPlayerCharacter : MonoBehaviour
 
         if (bActiveJetpack)
         {
-            if (Vector2.Distance(jetStart, transform.position) >= 2.8f)
+            if (Vector2.Distance(jetStart, transform.position) >= jetpackTileSize)
             {
                 Vector2 spawnLocation = transform.eulerAngles.y == 0f ? new Vector2(renderer.bounds.min.x, renderer.bounds.min.y) : new Vector2(renderer.bounds.max.x, renderer.bounds.min.y);
 
@@ -152,7 +154,7 @@ public class jsPlayerCharacter : MonoBehaviour
 
                 if (bWantsJetpack && waterAmount != 0)
                 {
-                    jetStart = new Vector2(transform.position.x, jetStart.y + 2.8f);
+                    jetStart = new Vector2(transform.position.x, jetStart.y + jetpackTileSize);
                 }
                 else
                 {

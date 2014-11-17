@@ -17,13 +17,19 @@ public class jsHUDComponent : MonoBehaviour
     
     void OnGUI() 
     {
-        GUI.Box(new Rect(10, 10, 100, 60), "Debug Menu");
-    
-        if(GUI.Button(new Rect(20,40,80,20), "Retry")) 
+        GUI.Box(new Rect(10, 10, 100, 80), "Debug Menu");
+   
+
+        if (GUI.Button(new Rect(20, 40, 80, 20), "Level 1"))
         {
-            Application.LoadLevel(Application.loadedLevel);
+            Application.LoadLevel(0);
         }
 
-        GUI.Box(new Rect(10, 80, 100, 40), "Water Amount \n" + PC.waterAmount.ToString());
+        if (GUI.Button(new Rect(20, 60, 80, 20), "Level 2"))
+        {
+            Application.LoadLevel(1);
+        }
+
+        GUI.Box(new Rect(10, 100, 100, 40), "Water Amount \n" + PC.waterAmount.ToString());
     }
 }
